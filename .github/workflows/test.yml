@@ -1,0 +1,37 @@
+# These tests were added to Aptible's fork to migrate off of travis.
+# However, upstream has already moved to GHA, so we should update our fork
+# and prefer their test suite
+
+name: test
+
+on:
+  pull_request:
+    branches:
+      - aptible
+  push:
+    branches:
+      - aptible
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          - 3.2
+          - 2.7
+          - 2.6
+        gemfile:
+          - openssl_2_1
+          - openssl_2_0
+          - openssl_default
+    env:
+      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - run: bundle exec rake
